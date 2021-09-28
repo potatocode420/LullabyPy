@@ -91,12 +91,11 @@ class Player(commands.Cog):
                         #await self.play_next(ctx)
                         return
                 except Exception as e:
-                    await ctx.send("Adding songs too fast")
+                    await ctx.send("Unable to process songs. Please try again.")
                     print(e)
+                    return
             else:
-                utils = self.bot.get_cog("Utils")
-                if utils is not None:
-                    await utils.on_command_error(ctx, "Unable to process songs. Please try again.")
+                await ctx.send("Song not found")
                 return
 
     @commands.command()
