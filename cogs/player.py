@@ -170,6 +170,7 @@ class Player(commands.Cog):
     @skip.before_invoke
     @loop.before_invoke
     @insert.before_invoke
+    @queue.before_invoke
     async def ensure_voice(self, ctx):
         if ctx.voice_client is None:
             if ctx.author.voice:

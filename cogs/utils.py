@@ -15,7 +15,7 @@ class Utils(commands.Cog):
     async def on_command_error(self, ctx, error):
         print(error)
         await ctx.send(error)
-        await ctx.send("Get more information on commands using -help")
+        await ctx.send("Get more information on commands using !help")
 
     @commands.command()
     async def help(self, ctx):
