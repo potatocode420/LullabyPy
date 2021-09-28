@@ -1,0 +1,44 @@
+{
+    "help": [
+        {
+            "command": "-play <song>",
+            "description": "Plays a song. Adds to queue if there is a song playing"
+        },
+        {
+            "command": "-pause",
+            "description": "Pauses current song"
+        },
+        {
+            "command": "-resume",
+            "description": "Resumes current song"
+        },
+        {
+            "command": "-np",
+            "description": "Returns the song that is currently playing"
+        },
+        {
+            "command": "-loop",
+            "description": "Loops current song. Use again to disable"
+        },
+        {
+            "command": "-skip",
+            "description": "Skips current song if it is not the last song"
+        },
+        {
+            "command": "-stop",
+            "description": "Remove Lullaby from voice channel"
+        },
+        {
+            "command": "-queue",
+            "description": "Returns the current song list"
+        },
+        {
+            "command": "-insert <index> <song>",
+            "description": "Inserts song at the chosen index"
+        },
+        {
+            "command": "-jump <index>",
+            "description": "Jumps to the chosen index"
+        }
+    ]
+}
