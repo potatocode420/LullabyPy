@@ -20,7 +20,7 @@ class Utils(commands.Cog):
     @commands.command()
     async def help(self, ctx):
         #path_to_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets\\help.json  ')
-        path_to_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets/help.json  ') #for heroku
+        path_to_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'assets/help.json') #for heroku
         f = open(path_to_file,"r")
         jsondata = json.load(f)
         message = EmbedMessage().print_help(jsondata["help"], ctx)
