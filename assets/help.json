@@ -2,7 +2,7 @@
     "help": [
         {
             "command": "-play <song>",
-            "description": "Plays a song. Adds to queue if there is a song playing"
+            "description": "Plays a song. Adds to queue if there is a song playing."
         },
         {
             "command": "-pause",
