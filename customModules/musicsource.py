@@ -15,7 +15,7 @@ class MusicSource(discord.PCMVolumeTransformer):
         'restrictfilenames': True,
         'noplaylist': True,
         'nocheckcertificate': True,
-        'ignoreerrors': False,
+        'ignoreerrors': True,
         'logtostderr': False,
         'quiet': True,
         'no_warnings': True,
@@ -35,15 +35,18 @@ class MusicSource(discord.PCMVolumeTransformer):
         
         return yt_url
 
-    async def from_url(self, url, stream=True, loop=False):
+    def from_url(self, url, stream=True, loop=False):
         data = self.ytdl.extract_info(url, download=not stream)
-        if 'entries' in data:
+        if data["entries"]:
             data = data['entries'][0]
-        filename = data['url'] if stream else self.ytdl.prepare_filename(data)
+            filename = data['url'] if stream else self.ytdl.prepare_filename(data)
+        else:
+            print("No entries found")
+            return None
 
         play = discord.FFmpegPCMAudio(filename, **{
             'options': "-vn",
-            "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
+            "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 ",
         })
         song = Song(play, data["title"], data["duration"], url)
 
