@@ -1,18 +1,31 @@
 from customModules.linkedlist import Node, SLinkedList
 from customModules.song import Song
+import discord
 class Playlist:
     def __init__(self):
         self.playlist = SLinkedList()
         self.loopsong = False
-    
-    def get_current_song(self):
-        return self.playlist.head
+        self.current = self.playlist.head
+
+    ###Functions to control playlist actions
+
+    #get current song and goes to the next
+    def play_song(self, ctx):
+        try:
+            self.current = self.playlist.head.data
+            ctx.voice_client.play(self.current.play, after=lambda: self.play_song(ctx))
+        except Exception as e:
+            print("Error in play_song: "+str(e))
+            
+        if self.count_in_playlist() > 0 and not self.loopsong:
+            self.playlist.NextNode()
 
     def get_latest_song(self):
         return self.playlist.tail
 
     def add_to_playlist(self, song):
-        self.playlist.AddEnd(song)
+        if song is not None:
+            self.playlist.AddEnd(song)
     
     #remove from playlist
     def remove_from_playlist(self, song):
