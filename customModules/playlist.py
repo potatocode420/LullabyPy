@@ -1,24 +1,32 @@
 from customModules.linkedlist import Node, SLinkedList
-from customModules.song import Song
-import discord
+from customModules.musicsource import MusicSource
+
 class Playlist:
     def __init__(self):
         self.playlist = SLinkedList()
         self.loopsong = False
         self.current = self.playlist.head
+        self.musicsource = MusicSource()
 
     ###Functions to control playlist actions
 
     #get current song and goes to the next
     def play_song(self, ctx):
-        try:
-            self.current = self.playlist.head.data
-            ctx.voice_client.play(self.current.play, after=lambda: self.play_song(ctx))
-        except Exception as e:
-            print("Error in play_song: "+str(e))
-            
-        if self.count_in_playlist() > 0 and not self.loopsong:
-            self.playlist.NextNode()
+        if self.playlist.head is not None:
+            try:
+                self.current = self.playlist.head
+                ctx.voice_client.play(self.current.data.play, after=lambda e: self.next_from_playlist(ctx))
+            except Exception as e:
+                print("Error in play_song: "+str(e))
+
+        else:
+            self.current = None
+
+    def skip_song(self, ctx):
+        self.loopsong = False
+        self.playlist.NextNode()
+        ctx.voice_client.pause()
+        self.play_song(ctx)
 
     def get_latest_song(self):
         return self.playlist.tail
@@ -32,12 +40,17 @@ class Playlist:
         self.playlist.RemoveNode(song)
 
     #next song from playlist
-    def next_from_playlist(self):
-        if (self.playlist.NextNode() is not None):
-            self.playlist.NextNode()
+    def next_from_playlist(self, ctx):
+        if self.loopsong:
+            print("loop")
+            self.playlist.head.data = self.musicsource.from_url(self.current.data.url)
+            self.play_song(ctx)
+            return
 
-    def fetch_next_song(self):
-        return self.playlist.head.next
+        if (self.current is not None):
+            print("next song")
+            self.playlist.NextNode()
+            self.play_song(ctx)
 
     #jump songs in playlist
     def jump_from_playlist(self, index):
@@ -66,6 +79,7 @@ class Playlist:
     #empty the playlist
     def empty_playlist(self):
         self.playlist = SLinkedList()
+        self.current = self.playlist.head
 
     #save the playlist
 

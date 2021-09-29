@@ -12,10 +12,11 @@ class Utils(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
+    async def on_command_error(self, ctx, error, errortype):
+        if errortype == commands.CommandNotFound:
+            await ctx.send(error)
+            await ctx.send("Get more information on commands using !help")
         print(error)
-        await ctx.send(error)
-        await ctx.send("Get more information on commands using !help")
 
     @commands.command()
     async def help(self, ctx):

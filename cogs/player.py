@@ -24,16 +24,12 @@ class Server:
 
         if (self.playlist.get(server.id) is None):
             self.playlist[server.id] = Playlist()
-        return self.playlist
-        
-                                                                                                                                                                                                                                                                        
+        return self.playlist                                                                                                                                                                                                                                                                    
     
 class Player(commands.Cog):
-    def __init__(self, bot : commands.Bot, server : Server):
+    def __init__(self, bot : commands.Bot):
         self.bot = bot
-        self.musicsource = MusicSource()
-        self.server = server
-        self.playlist = server.get_server(discord.client.Guild)
+        self.playlist = {}
 
     @commands.command()
     async def pause(self, ctx):
@@ -52,51 +48,51 @@ class Player(commands.Cog):
     @commands.command()
     async def play(self, ctx, *, url):
         async with ctx.typing():
-            song = self.musicsource.from_url(url)
+            song = self.playlist[ctx.message.guild.id].musicsource.from_url(url)
         try:
             await ctx.send(embed=EmbedMessage().print_add_song(song.title))
             self.playlist[ctx.message.guild.id].add_to_playlist(song)
+            print("Added song")
         except Exception as e:
             print(e)
             await ctx.send("Unable to find song")
         else:
-            if not ctx.voice_client.is_playing():
+            await asyncio.sleep(1)
+            if not ctx.voice_client.is_playing() and self.playlist[ctx.message.guild.id].current is None:
                 self.playlist[ctx.message.guild.id].play_song(ctx)
 
     @commands.command()
     async def loop(self, ctx):
-        if self.playlist[ctx.message.guild.id]["current"] is not None:
-            self.playlist[ctx.message.guild.id]["playlist"].loopsong = not self.playlist[ctx.message.guild.id]["playlist"].loopsong
-            if self.playlist[ctx.message.guild.id]["playlist"].loopsong:
-                await ctx.send(f"Loop enabled for {self.playlist[ctx.message.guild.id]['current'].data.title}")
-            else: 
+        if self.playlist[ctx.message.guild.id].current is not None:
+            self.playlist[ctx.message.guild.id].loopsong = not self.playlist[ctx.message.guild.id].loopsong
+            if self.playlist[ctx.message.guild.id].loopsong:
+                await ctx.send("Now looping")
+            else:
                 await ctx.send("Loop disabled")
-        else:
-            await ctx.send("No current song to loop")
+            return
+        await ctx.send("No song to loop")
     
     @commands.command()
     async def skip(self, ctx):
-        if self.playlist[ctx.message.guild.id]["playlist"].count_in_playlist() >= 1:    
-            self.playlist[ctx.message.guild.id]["playlist"].loopsong = False
-            ctx.voice_client.pause()
-            await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id]["playlist"].get_current_song().data.title))
-            asyncio.run_coroutine_threadsafe(self.play_song(ctx), self.bot.loop)
+        if self.playlist[ctx.message.guild.id].count_in_playlist() > 1:    
+            self.playlist[ctx.message.guild.id].skip_song(ctx)
+            await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id].current.data.title))
             print("skip successful")
             return
         await ctx.send("No more songs in queue")
 
     @commands.command()
     async def stop(self, ctx):
-        self.playlist[ctx.message.guild.id]["playlist"].empty_playlist()
-        self.playlist[ctx.message.guild.id]["current"] = None
+        self.playlist[ctx.message.guild.id].empty_playlist()
         await ctx.voice_client.disconnect()
 
     @commands.command()
     async def queue(self, ctx):
-        if self.playlist[ctx.message.guild.id]["current"] is not None:
-            message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id]["playlist"].get_current_song(), self.playlist[ctx.message.guild.id]["current"].data)
-        else:
-            message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id]["playlist"].get_current_song(), None)
+        async with ctx.typing():
+            if self.playlist[ctx.message.guild.id].current is not None:
+                message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id].current)
+            else:
+                message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id].current)
         await ctx.send(embed=message)
 
     @commands.command()
@@ -104,7 +100,7 @@ class Player(commands.Cog):
         try: 
             async with ctx.typing():
                 index = int(index)
-                song = await self.musicsource.from_url(url)
+                song = self.playlist[ctx.message.guild.id].musicsource.from_url(url)
                 self.playlist[ctx.message.guild.id]["playlist"].insert_between_playlist(index, song)
                 await ctx.send(embed=EmbedMessage().print_add_song(song.title))
                 return
@@ -112,7 +108,7 @@ class Player(commands.Cog):
             print(e)
         utils = self.bot.get_cog("Utils")
         if utils is not None:
-            await utils.on_command_error(ctx, "Please enter a proper index. Example: !insert <index> <url>")
+            await utils.on_command_error(ctx, "Please enter a proper index. Example: !insert <index> <url>", commands.CommandNotFound)
         return
 
     @commands.command()
@@ -146,21 +142,19 @@ class Player(commands.Cog):
     @insert.before_invoke
     @queue.before_invoke
     async def ensure_voice(self, ctx):
+        if self.playlist.get(ctx.message.guild.id) is None:
+            self.playlist[ctx.message.guild.id] = Playlist()
+
         if ctx.voice_client is None:
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
-                self.playlist = self.server.get_server(ctx.message.guild)
                 return
-
             else:
                 await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
         
         if ctx.author.voice.channel is None:
             raise commands.CommandError("Author not same channel as voice client.")
-        #else:
-        #    if (self.playlist[ctx.message.guild].count_in_playlist() == 0):
-        #        self.playlist = self.server.get_server(ctx.message.guild)
 
 def setup(client):
-    client.add_cog(Player(client, Server()))
+    client.add_cog(Player(client))

@@ -1,7 +1,6 @@
 import asyncio
 import discord
 import asyncio
-import requests
 import youtube_dl
 import youtube_search
 import json
@@ -36,7 +35,7 @@ class MusicSource(discord.PCMVolumeTransformer):
         return yt_url
 
     def from_url(self, url, stream=True, loop=False):
-        data = self.ytdl.extract_info(url, download=not stream)
+        data = self.ytdl.extract_info(url, download=False)
         if data["entries"]:
             data = data['entries'][0]
             filename = data['url'] if stream else self.ytdl.prepare_filename(data)
