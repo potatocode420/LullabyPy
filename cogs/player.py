@@ -49,17 +49,15 @@ class Player(commands.Cog):
     async def play(self, ctx, *, url):
         async with ctx.typing():
             song = self.playlist[ctx.message.guild.id].musicsource.from_url(url)
-        try:
-            await ctx.send(embed=EmbedMessage().print_add_song(song.title))
-            self.playlist[ctx.message.guild.id].add_to_playlist(song)
-            print("Added song")
-        except Exception as e:
-            print(e)
+        if song is None:
             await ctx.send("Unable to find song")
-        else:
-            await asyncio.sleep(1)
-            if not ctx.voice_client.is_playing():
-                self.playlist[ctx.message.guild.id].play_song(ctx)
+            return
+        await ctx.send(embed=EmbedMessage().print_add_song(song.title))
+        self.playlist[ctx.message.guild.id].add_to_playlist(song)
+        print("Added song")
+        #await asyncio.sleep(1)
+        if not ctx.voice_client.is_playing():
+            self.playlist[ctx.message.guild.id].play_song(ctx)
 
     @commands.command()
     async def loop(self, ctx):
@@ -102,37 +100,20 @@ class Player(commands.Cog):
         if song is None:
             await ctx.send("Unable to find song")
             return
-        try: 
-            index = int(index)
-            self.playlist[ctx.message.guild.id].insert_between_playlist(index, song)
-            await ctx.send(embed=EmbedMessage().print_add_song(song.title))
-            return
-        except Exception as e:
-            print(e)
-        utils = self.bot.get_cog("Utils")
-        if utils is not None:
-            await utils.on_command_error(ctx, "Please enter a proper index. Example: !insert <index> <url>", commands.CommandNotFound)
-        return
+        index = int(index)
+        self.playlist[ctx.message.guild.id].insert_between_playlist(index, song)
+        await ctx.send(embed=EmbedMessage().print_add_song(song.title))
 
     @commands.command()
     async def jump(self, ctx, index):
-        try:
-            index = int(index)
-            self.playlist[ctx.message.guild.id]["playlist"].jump_from_playlist(index)
-            await ctx.send(embed=EmbedMessage().print_add_song(self.playlist[ctx.message.guild.id]["playlist"].get_current_song().data.title))
-            asyncio.run_coroutine_threadsafe(self.play_song(ctx), self.bot.loop)
-            return
-        except Exception as e:
-            print(e)
-        utils = self.bot.get_cog("Utils")
-        if utils is not None:
-            await utils.on_command_error(ctx, "Please enter a proper index. Example: !jump <index>")
-        return
+        index = int(index)
+        self.playlist[ctx.message.guild.id].jump_from_playlist(index)
+        await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id].current.data.title))
 
     @commands.command()
     async def np(self, ctx):
-        if (self.playlist[ctx.message.guild.id]["current"] is not None):
-            await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id]["current"].data.title))
+        if (self.playlist[ctx.message.guild.id].current is not None):
+            await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id].current.data.title))
         else:
             await ctx.send(embed=EmbedMessage().print_current_song(None))
 
@@ -158,6 +139,25 @@ class Player(commands.Cog):
         
         if ctx.author.voice.channel is None:
             raise commands.CommandError("Author not same channel as voice client.")
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx, error):
+        if isinstance(error, commands.MissingPermissions):
+            await ctx.send("No permissions to do that")
+        elif isinstance(error, commands.CommandNotFound):
+            await ctx.send("No command found")
+            await ctx.send("Get more information on commands using !help")
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send("Invalid arguments for command.")
+            await ctx.send("Get more information on commands using !help")
+        elif isinstance(error, commands.CommandInvokeError):
+            await ctx.send("Invalid arguments for command.")
+            await ctx.send("Get more information on commands using !help")
+        else:
+            await ctx.send("Failed to run command")
+            await ctx.send("Get more information on commands using !help")
+        print(type(error))
+        return
 
 def setup(client):
     client.add_cog(Player(client))
