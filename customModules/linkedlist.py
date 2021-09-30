@@ -1,6 +1,4 @@
-from os import remove
-
-
+#in hindsight, I probably could just turned playlist.py into a linkedlist without making this structure. But it was good revision =)
 class Node:
    def __init__(self, data=None, position=0):
       self.data = data
@@ -23,10 +21,8 @@ class SLinkedList:
     #Add a head node
     def NextNode(self):
         if(self.head is not None):
-            temp = self.head
             self.head.prev = None
             self.head = self.head.next
-            temp = None
 
     #Add nodes at the end
     def AddEnd(self, newdata):

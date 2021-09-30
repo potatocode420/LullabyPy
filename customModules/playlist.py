@@ -1,45 +1,74 @@
+import time
 from customModules.linkedlist import Node, SLinkedList
-from customModules.song import Song
+from customModules.musicsource import MusicSource
+
 class Playlist:
     def __init__(self):
         self.playlist = SLinkedList()
         self.loopsong = False
-    
-    def get_current_song(self):
-        return self.playlist.head
+        self.current = self.playlist.head
+        self.musicsource = MusicSource()
+
+    ###Functions to control playlist actions
+
+    #get current song and goes to the next
+    def play_song(self, ctx):
+        if self.playlist.head is not None:
+            try:
+                self.current = self.playlist.head
+                ctx.voice_client.play(self.current.data.play, after=lambda e: self.next_from_playlist(ctx))
+            except Exception as e:
+                print("Error in play_song: "+str(e))
+
+        else:
+            self.current = None
+
+    def skip_song(self, ctx):
+        self.loopsong = False
+        self.playlist.NextNode()
+        ctx.voice_client.pause()
+        self.play_song(ctx)
 
     def get_latest_song(self):
         return self.playlist.tail
 
     def add_to_playlist(self, song):
-        self.playlist.AddEnd(song)
+        if song is not None:
+            self.playlist.AddEnd(song)
     
     #remove from playlist
     def remove_from_playlist(self, song):
         self.playlist.RemoveNode(song)
 
     #next song from playlist
-    def next_from_playlist(self):
-        if (self.playlist.NextNode() is not None):
-            self.playlist.NextNode()
+    def next_from_playlist(self, ctx):
+        if self.loopsong:
+            print("loop")
+            self.playlist.head.data = self.musicsource.from_url(self.current.data.url)
+            time.sleep(1)
+            self.play_song(ctx)
+            return
 
-    def fetch_next_song(self):
-        return self.playlist.head.next
+        if (self.current is not None):
+            print("next song")
+            self.playlist.NextNode()
+            self.play_song(ctx)
 
     #jump songs in playlist
-    def jump_from_playlist(self, index):
+    def jump_from_playlist(self, ctx, index):
         if (index < 1):
-            raise Exception("Index must be more than 1") #because list queue starts from number 1
-
-        index -= 1 #because index starts from 0
+            raise Exception("Index must be more than 1 or more") #cannot jump to current song
+        self.loopsong = False
         self.playlist.JumpNode(index)
+        ctx.voice_client.pause()
+        self.play_song(ctx)
     
     #insert songs in between
     def insert_between_playlist(self, index, song):
         if (index < 1):
             raise Exception("Index must be more than 1") #because list queue starts from number 1
         
-        index-=1
+        index-=1 #insert at the number itself
         self.playlist.Inbetween(index, song)
 
     #loop current song
@@ -53,6 +82,7 @@ class Playlist:
     #empty the playlist
     def empty_playlist(self):
         self.playlist = SLinkedList()
+        self.current = self.playlist.head
 
     #save the playlist
 
