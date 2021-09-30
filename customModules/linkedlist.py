@@ -1,6 +1,4 @@
-from os import remove
-
-
+#in hindsight, I probably could just turned playlist.py into a linkedlist without making this structure. But it was good revision =)
 class Node:
    def __init__(self, data=None, position=0):
       self.data = data

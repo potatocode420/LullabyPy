@@ -58,7 +58,7 @@ class Player(commands.Cog):
             await ctx.send("Unable to find song")
         else:
             await asyncio.sleep(1)
-            if not ctx.voice_client.is_playing() and self.playlist[ctx.message.guild.id].current is None:
+            if not ctx.voice_client.is_playing():
                 self.playlist[ctx.message.guild.id].play_song(ctx)
 
     @commands.command()
@@ -97,13 +97,16 @@ class Player(commands.Cog):
 
     @commands.command()
     async def insert(self, ctx, index, *, url):
+        async with ctx.typing():
+            song = self.playlist[ctx.message.guild.id].musicsource.from_url(url)
+        if song is None:
+            await ctx.send("Unable to find song")
+            return
         try: 
-            async with ctx.typing():
-                index = int(index)
-                song = self.playlist[ctx.message.guild.id].musicsource.from_url(url)
-                self.playlist[ctx.message.guild.id]["playlist"].insert_between_playlist(index, song)
-                await ctx.send(embed=EmbedMessage().print_add_song(song.title))
-                return
+            index = int(index)
+            self.playlist[ctx.message.guild.id].insert_between_playlist(index, song)
+            await ctx.send(embed=EmbedMessage().print_add_song(song.title))
+            return
         except Exception as e:
             print(e)
         utils = self.bot.get_cog("Utils")

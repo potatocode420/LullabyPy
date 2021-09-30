@@ -1,3 +1,4 @@
+import time
 from customModules.linkedlist import Node, SLinkedList
 from customModules.musicsource import MusicSource
 
@@ -44,6 +45,7 @@ class Playlist:
         if self.loopsong:
             print("loop")
             self.playlist.head.data = self.musicsource.from_url(self.current.data.url)
+            time.sleep(1)
             self.play_song(ctx)
             return
 
