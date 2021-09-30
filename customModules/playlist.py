@@ -55,19 +55,20 @@ class Playlist:
             self.play_song(ctx)
 
     #jump songs in playlist
-    def jump_from_playlist(self, index):
+    def jump_from_playlist(self, ctx, index):
         if (index < 1):
-            raise Exception("Index must be more than 1") #because list queue starts from number 1
-
-        index -= 1 #because index starts from 0
+            raise Exception("Index must be more than 1 or more") #cannot jump to current song
+        self.loopsong = False
         self.playlist.JumpNode(index)
+        ctx.voice_client.pause()
+        self.play_song(ctx)
     
     #insert songs in between
     def insert_between_playlist(self, index, song):
         if (index < 1):
             raise Exception("Index must be more than 1") #because list queue starts from number 1
         
-        index-=1
+        index-=1 #insert at the number itself
         self.playlist.Inbetween(index, song)
 
     #loop current song

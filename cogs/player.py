@@ -107,7 +107,10 @@ class Player(commands.Cog):
     @commands.command()
     async def jump(self, ctx, index):
         index = int(index)
-        self.playlist[ctx.message.guild.id].jump_from_playlist(index)
+        try:
+            self.playlist[ctx.message.guild.id].jump_from_playlist(ctx, index)
+        except Exception as e:
+            await self.on_command_error(ctx, e)
         await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id].current.data.title))
 
     @commands.command()
