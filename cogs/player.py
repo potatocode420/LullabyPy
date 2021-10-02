@@ -88,9 +88,9 @@ class Player(commands.Cog):
     async def queue(self, ctx):
         async with ctx.typing():
             if self.playlist[ctx.message.guild.id].current is not None:
-                message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id].current)
+                message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id].current, self.playlist[ctx.message.guild.id].count_in_playlist())
             else:
-                message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id].current)
+                message = EmbedMessage().print_queue(None, 0)
         await ctx.send(embed=message)
 
     @commands.command()

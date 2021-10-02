@@ -10,120 +10,184 @@ class SLinkedList:
       self.head = None
       self.tail = None
 
-    #Add nodes at the start
-    #perhaps i don't really need this, considering how you cannot reverse the song queue
-    # def AtStart(self, newdata):
-    #     NewNode = Node(newdata)
-    #     NewNode.next = self.head
-    #     self.head = NewNode
-
     #Add a head node
     def NextNode(self):
         if(self.head is not None):
             self.head = self.head.next
             return
-        self.tail = None
+        #Set head and tail to none
+        self.tail = self.head = None
+
+    #Add nodes at the start
+    def AddStart(self, newdata):
+        NewNode = Node(newdata)
+        if self.head is None:
+            NewNode.next = NewNode.prev = NewNode
+            self.head = self.tail = NewNode
+            return
+
+        NewNode.next = self.head
+        NewNode.prev = self.tail
+        self.tail.next = self.head.prev = NewNode
+        self.head = self.head.prev
 
     #Add nodes at the end
     def AddEnd(self, newdata):
         NewNode = Node(newdata)
         if self.head is None:
+            NewNode.next = NewNode.prev = NewNode
             self.head = self.tail = NewNode
             return
 
+        #Head will be the next node
+        NewNode.next = self.head
+        #Current tail will be previous node
         NewNode.prev = self.tail
+        #Previous of head will be the new node
+        self.head.prev = NewNode
+        #Next node of current tail will be the new tail
         self.tail.next = NewNode
+        #Set new current tail
         self.tail = self.tail.next
 
     #Add nodes at selected index
-    def InsertBefore(self, index, new_node):  
+    #This is trippy but it works such that it finds the node that is 2 nodes before the target node, then adds a node after it
+    #This function assumes anything less than index 1 is index 1
+    def InsertAtIndex(self, index, new_node):  
         temp = self.head
 
         NewNode = Node(new_node)
 
-        count = 0
+        #because we want to insert at its exact position, count starts with 1
+        count = 1
+
         if self.head is None:
             self.head = self.tail = NewNode
             return
+        
+        if index == 0:
+            self.AddStart(NewNode.data)
+            return
+        
+        #Add to end if index not found
+        if index > self.GetCount():
+            self.AddEnd(NewNode.data)
+            return
 
-        #Find the correct index if playlist not empty
-        while temp:
-            #We check for the prev because the new song will not go beyond the tail
-            # if temp == self.tail:
-            #     temp2 = temp.prev
-            #     self.tail.next = temp2
-            #     return
-
-            if count == index:
-                temp.next = NewNode
-                temp = temp.next
-                # NewNode.prev = temp.prev
-                # NewNode.next = temp
-                # temp = NewNode
-                return  
-            count+=1
+        #Loop temp to the current node
+        #-1 to the index because we want to get the node before it
+        while count < index-1:
             temp = temp.next
+            count+=1
 
-        #Add to the end if index not found
-        self.tail.next = NewNode
+        #Next node of new node is next of current node
+        NewNode.next = temp.next
+        #Previous node of new node is previous of current node
+        NewNode.prev = temp
+        #Next node of current node is the new node
+        temp.next = NewNode
+        return  
+    
+    def RemoveFirst(self):
+        temp = self.head
+        prev = self.head.prev
+        if self.head is None:
+            raise Exception("List is empty")
+        
+        if temp.next == temp:
+            self.head = self.tail = None
+            return
+        
+        prev.next = temp.next
+        self.head = prev.next
+
+    def RemoveLast(self):
         temp = self.tail
-        self.tail = self.tail.next
-        self.tail.prev = temp
+        prev = self.tail.prev
+        if self.head is None:
+            raise Exception("List is empty")
+        
+        if temp.next == temp:
+            self.head = self.tail = None
+            return
+        
+        prev.next = temp.next
+        self.tail = prev
+        self.head = prev.next
     
     def RemoveNode(self, index):
         if self.head == None:
             raise Exception("List is empty")
 
-        count = 0
+        #We want to get the exact index to be deleted
+        count = 1
         temp = self.head
+        prev = self.head.prev
 
-        if index == 0:
-            self.head = temp.next
-            return
-
-        #Find the correct index if playlist not empty
-        while temp is not None:
-            if temp == self.tail:
-                self.tail = prev
-                return temp
-
-            if count == index:  
-                prev.next = temp.next
-                return temp
-            count+=1
+        if index > self.GetCount():
+            raise Exception("Data not found in list")
+        
+        while count < index:
             prev = temp
             temp = temp.next
+            count+=1
 
-        raise Exception("Data not found in list")
+        if temp == self.head:
+            prev.next = temp.next
+            #set new head and next tail node
+            self.RemoveFirst()
+            return
+        if temp == self.tail:
+            #set new tail and prev head node
+            self.RemoveLast()
+            return
+        prev.next = temp.next
 
     def JumpNode(self, index):
         if self.head == None:
             raise Exception("List is empty")
             
-        count = 0
+        count = 1
         temp = self.head
 
-        while temp:
-            if count == index:
-                self.head = temp
-                return  
-            count+=1
-            temp = temp.next
+        if index > self.GetCount():
+            raise Exception("Index does not exist in list") 
 
-        raise Exception("Index does not exist in list")    
+        while count < index:
+            temp = temp.next
+            count+=1
+
+        self.head = temp
+        self.head.prev = self.tail
+        self.tail.next = self.head  
+
+    #Get the node
+    def GetNode(self, index):
+        count = 0
+        temp = self.head
+        if index > self.GetCount():
+            return temp.tail
+        while count < index:
+            temp = temp.next
+            count+=1
+        return temp
 
     #Print the linked list
     def PrintList(self):
-        printval = self.head
-        while printval is not None:
-            print (printval.data)
-            printval = printval.next
+        temp = self.head
+        nodesinlist = ""
+        while (temp.next != self.head):
+            nodesinlist += temp.data + " "
+            temp = temp.next
+        nodesinlist += temp.data
+        return nodesinlist
     
     #Get count of linked list
     def GetCount(self):
         temp = self.head
-        count = 0
-        while (temp):
+        #Count starts from one because increment for head is missing in loop
+        count = 1
+        while (temp.next != self.head):
             count+=1
             temp = temp.next
         return count

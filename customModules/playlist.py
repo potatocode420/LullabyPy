@@ -62,7 +62,7 @@ class Playlist:
     #jump songs in playlist
     def jump_from_playlist(self, ctx, index):
         if (index < 1):
-            raise Exception("Index must be more than 1 or more") #cannot jump to current song
+            raise Exception("Index must be more than 1") #cannot jump to current song
         self.loopsong = False
         self.playlist.JumpNode(index)
         ctx.voice_client.pause()
@@ -73,7 +73,7 @@ class Playlist:
         if (index < 1):
             raise Exception("Index must be more than 1") #because list queue starts from number 1
 
-        self.playlist.InsertBefore(index, song)
+        self.playlist.InsertAtIndex(index, song)
 
     #count songs in playlist
     def count_in_playlist(self):

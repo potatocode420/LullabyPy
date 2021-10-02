@@ -4,24 +4,23 @@ class EmbedMessage:
         self.message = "Bot created for non commercial purposes."
         self.colour = 0x00ff00
     
-    def print_queue(self, song):
+    def print_queue(self, song, count):
         index = 1
         songlist = ""
 
         if song is not None:
             embedVar = discord.Embed(title="Current song", description=song.data.title, color=self.colour)
-
-            song = song.next
-            if song is not None:
-                while song:
-                    songlist += f"{index}. {song.data.title} duration: {song.data.duration}\n"
-                    song = song.next
-                    index +=1
-            else:
-                songlist = "No songs in queue"
-            embedVar.add_field(name="Music Queue", value=songlist)
         else:
             embedVar = discord.Embed(title="Current song", description="No songs playing", color=self.colour)
+
+        if index < count:
+            while song:
+                songlist += f"{index}. {song.data.title} duration: {song.data.duration}\n"
+                song = song.next
+                index +=1
+        else:
+            songlist = "No songs in queue"
+            embedVar.add_field(name="Music Queue", value=songlist)
         return embedVar
 
     def print_current_song(self, currentsong):
