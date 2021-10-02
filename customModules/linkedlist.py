@@ -10,13 +10,31 @@ class SLinkedList:
       self.head = None
       self.tail = None
 
-    #Add a head node
+    #Go to next node, destroys current one
     def NextNode(self):
+        if(self.head is not None):
+            #delete remaining node
+            #this prevents playlist-wide looping
+            if self.head == self.head.next:
+                self.head = self.tail = None
+                return
+            self.head = self.tail.next = self.head.next
+            self.head.prev = self.tail
+            return
+        #Set head and tail to none
+        self.tail = self.head = None
+    
+    #Goes to next node without destroying the current one
+    def MoveNextNode(self):
         if(self.head is not None):
             self.head = self.head.next
             return
         #Set head and tail to none
         self.tail = self.head = None
+
+    #Go to next node, does not destroy current one
+    #not sure about this, for my unmoving playlist, I might use the original next, but add a backup node before it gets destroyed since 
+    #I can't reuse the same nodes anyway (the play will not work, fuck)
 
     #Add nodes at the start
     def AddStart(self, newdata):
@@ -43,10 +61,8 @@ class SLinkedList:
         NewNode.next = self.head
         #Current tail will be previous node
         NewNode.prev = self.tail
-        #Previous of head will be the new node
-        self.head.prev = NewNode
-        #Next node of current tail will be the new tail
-        self.tail.next = NewNode
+        #Previous of head and next of tail will be the new node
+        self.head.prev = self.tail.next = NewNode
         #Set new current tail
         self.tail = self.tail.next
 
@@ -136,12 +152,13 @@ class SLinkedList:
             prev.next = temp.next
             #set new head and next tail node
             self.RemoveFirst()
-            return
-        if temp == self.tail:
+        elif temp == self.tail:
             #set new tail and prev head node
             self.RemoveLast()
-            return
-        prev.next = temp.next
+        else:
+            prev.next = temp.next
+            (prev.next).prev = temp.prev
+        return temp
 
     def JumpNode(self, index):
         if self.head == None:
@@ -165,8 +182,8 @@ class SLinkedList:
     def GetNode(self, index):
         count = 0
         temp = self.head
-        if index > self.GetCount():
-            return temp.tail
+        if index >= self.GetCount():
+            return self.tail
         while count < index:
             temp = temp.next
             count+=1
@@ -191,4 +208,3 @@ class SLinkedList:
             count+=1
             temp = temp.next
         return count
-

@@ -8,18 +8,21 @@ class EmbedMessage:
         index = 1
         songlist = ""
 
+        #Section to show current
         if song is not None:
             embedVar = discord.Embed(title="Current song", description=song.data.title, color=self.colour)
         else:
             embedVar = discord.Embed(title="Current song", description="No songs playing", color=self.colour)
 
-        if index < count:
-            while song:
-                songlist += f"{index}. {song.data.title} duration: {song.data.duration}\n"
-                song = song.next
-                index +=1
-        else:
+        #Section to show upcoming songs
+        if index >= count:
             songlist = "No songs in queue"
+            embedVar.add_field(name="Music Queue", value=songlist)
+        else:
+            while index < count:
+                song = song.next
+                songlist += f"{index}. {song.data.title} duration: {song.data.duration}\n"
+                index +=1
             embedVar.add_field(name="Music Queue", value=songlist)
         return embedVar
 

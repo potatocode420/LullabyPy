@@ -57,19 +57,39 @@ class TestLinkedList(unittest.TestCase):
         #Test for new insertion value prev
         self.assertEqual(newlist.GetNode(3).prev.data,"c")
     
-    def test_next_node(self):
+    def test_move_next_node(self):
         newlist = SLinkedList()
         newlist.AddEnd("a")
         newlist.AddEnd("b")
         newlist.AddEnd("c")
-        newlist.NextNode()
-        newlist.NextNode()
+        newlist.MoveNextNode()
+        newlist.MoveNextNode()
         #test for current head
         self.assertEqual(newlist.head.data, "c")
         #test for next head
         self.assertEqual(newlist.head.next.data, "a")
         #test for prev
         self.assertEqual(newlist.head.prev.data, "b")
+
+    def test_next_node(self):
+        newlist = SLinkedList()
+        newlist.AddEnd("a")
+        newlist.AddEnd("b")
+        newlist.AddEnd("c")
+        newlist.AddEnd("d")
+        newlist.AddEnd("e")
+        newlist.NextNode()
+        newlist.NextNode()
+        #test for current head
+        self.assertEqual(newlist.head.data, "c")
+        #test for head next and prev
+        self.assertEqual(newlist.head.next.data, "d")
+        self.assertEqual(newlist.head.prev.data, "e")
+        #test for empty playlist after going through all next
+        newlist.NextNode()
+        newlist.NextNode()
+        newlist.NextNode()
+        self.assertEqual(newlist.head, None)
 
     def test_remove_node(self):
         newlist = SLinkedList()
@@ -80,10 +100,18 @@ class TestLinkedList(unittest.TestCase):
 
         #test for new node order after removal
         self.assertEqual(newlist.PrintList(),"a c")
-        #test for next head
+        #test for head and tail
+        self.assertEqual(newlist.head.data, "a")
+        self.assertEqual(newlist.tail.data, "c")
+        #test for next and prev
         self.assertEqual(newlist.GetNode(1).next.data, "a")
-        #test for next prev
-        self.assertEqual(newlist.GetNode(1).prev.data, "b")
+        self.assertEqual(newlist.GetNode(1).prev.data, "a")
+        #test get single node
+        newlist.RemoveNode(2)
+        self.assertEqual(newlist.GetNode(10).next.data, "a")
+        #test for none after removing all
+        newlist.RemoveNode(1)
+        self.assertEqual(newlist.head, None)
 
     def test_remove_node_tail_head(self):
         newlist = SLinkedList()

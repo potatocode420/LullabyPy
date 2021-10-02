@@ -41,6 +41,7 @@ class Playlist:
     def remove_from_playlist(self, index):
         if (index < 1):
             raise Exception("Index must be more than 1 or more") #cannot jump to current song
+        index+=1 #current song is considered part of the index, so we increment 1 to skip over it
         song = self.playlist.RemoveNode(index).data
         song = Song(song.play, song.title, song.duration, song.url)
         return song
@@ -63,6 +64,8 @@ class Playlist:
     def jump_from_playlist(self, ctx, index):
         if (index < 1):
             raise Exception("Index must be more than 1") #cannot jump to current song
+
+        index+=1 #current song is considered part of the index, so we increment 1 to skip over it
         self.loopsong = False
         self.playlist.JumpNode(index)
         ctx.voice_client.pause()
@@ -72,6 +75,8 @@ class Playlist:
     def insert_between_playlist(self, index, song):
         if (index < 1):
             raise Exception("Index must be more than 1") #because list queue starts from number 1
+        
+        index+=1 #current song is considered part of the index, so we increment 1 to skip over it
 
         self.playlist.InsertAtIndex(index, song)
 
