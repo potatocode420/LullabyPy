@@ -11,6 +11,7 @@ class SLinkedList:
       self.tail = None
 
     #Go to next node, destroys current one
+    #For list loops
     def NextNode(self):
         if(self.head is not None):
             #delete remaining node
@@ -25,6 +26,7 @@ class SLinkedList:
         self.tail = self.head = None
     
     #Goes to next node without destroying the current one
+    #For non list loops
     def MoveNextNode(self):
         if(self.head is not None):
             self.head = self.head.next

@@ -26,9 +26,8 @@ class Playlist:
 
     def skip_song(self, ctx):
         self.loopsong = False
-        self.playlist.NextNode()
         ctx.voice_client.pause()
-        self.play_song(ctx)
+        self.next_from_playlist(ctx)
 
     def get_latest_song(self):
         return self.playlist.tail
