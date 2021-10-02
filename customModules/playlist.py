@@ -1,6 +1,7 @@
 import time
 from customModules.linkedlist import Node, SLinkedList
 from customModules.musicsource import MusicSource
+from customModules.song import Song
 
 class Playlist:
     def __init__(self):
@@ -37,15 +38,19 @@ class Playlist:
             self.playlist.AddEnd(song)
     
     #remove from playlist
-    def remove_from_playlist(self, song):
-        self.playlist.RemoveNode(song)
+    def remove_from_playlist(self, index):
+        if (index < 1):
+            raise Exception("Index must be more than 1 or more") #cannot jump to current song
+        song = self.playlist.RemoveNode(index).data
+        song = Song(song.play, song.title, song.duration, song.url)
+        return song
 
     #next song from playlist
     def next_from_playlist(self, ctx):
         if self.loopsong:
             print("loop")
             self.playlist.head.data = self.musicsource.from_url(self.current.data.url)
-            time.sleep(1)
+            time.sleep(0.5)
             self.play_song(ctx)
             return
 
@@ -67,13 +72,8 @@ class Playlist:
     def insert_between_playlist(self, index, song):
         if (index < 1):
             raise Exception("Index must be more than 1") #because list queue starts from number 1
-        
-        index-=1 #insert at the number itself
-        self.playlist.Inbetween(index, song)
 
-    #loop current song
-    def loop_in_playlist(self, song):
-        self.playlist.AddStart(song)
+        self.playlist.InsertBefore(index, song)
 
     #count songs in playlist
     def count_in_playlist(self):

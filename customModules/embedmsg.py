@@ -35,6 +35,10 @@ class EmbedMessage:
         embedVar = discord.Embed(title="Added to queue", description=currentsong, color=self.colour)
         return embedVar
 
+    def print_remove_song(self, removedsong):
+        embedVar = discord.Embed(title="Removed from queue", description=removedsong, color=self.colour)
+        return embedVar
+
     def print_help(self, helpcommands, ctx:discord.Client):
         embedVar = discord.Embed(title="Help List", description="Commands for Lullaby", color=self.colour)
         embedVar.set_author(name=ctx.author.display_name, icon_url=ctx.author.avatar_url)

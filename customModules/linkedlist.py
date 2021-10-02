@@ -1,10 +1,9 @@
 #in hindsight, I probably could just turned playlist.py into a linkedlist without making this structure. But it was good revision =)
 class Node:
-   def __init__(self, data=None, position=0):
+   def __init__(self, data=None):
       self.data = data
       self.next = None
       self.prev = None
-      self.position = position
 
 class SLinkedList:
     def __init__(self):
@@ -21,8 +20,9 @@ class SLinkedList:
     #Add a head node
     def NextNode(self):
         if(self.head is not None):
-            self.head.prev = None
             self.head = self.head.next
+            return
+        self.tail = None
 
     #Add nodes at the end
     def AddEnd(self, newdata):
@@ -30,70 +30,69 @@ class SLinkedList:
         if self.head is None:
             self.head = self.tail = NewNode
             return
+
+        NewNode.prev = self.tail
         self.tail.next = NewNode
         self.tail = self.tail.next
-        self.reset_position()
 
-    #Add nodes in between
-    def Inbetween(self, index, new_node):  
-        NewNode = Node(new_node)
-        count = 0
+    #Add nodes at selected index
+    def InsertBefore(self, index, new_node):  
         temp = self.head
+
+        NewNode = Node(new_node)
+
+        count = 0
         if self.head is None:
             self.head = self.tail = NewNode
-            self.reset_position()
             return
 
         #Find the correct index if playlist not empty
         while temp:
-            #Add to end if index is at the end of list
-            if temp == self.tail:
-                self.tail.next = NewNode
-                self.tail = self.tail.next
-                self.reset_position()
-                return
+            #We check for the prev because the new song will not go beyond the tail
+            # if temp == self.tail:
+            #     temp2 = temp.prev
+            #     self.tail.next = temp2
+            #     return
 
             if count == index:
-                NewNode.next = temp.next
                 temp.next = NewNode
-                self.reset_position()
+                temp = temp.next
+                # NewNode.prev = temp.prev
+                # NewNode.next = temp
+                # temp = NewNode
                 return  
             count+=1
             temp = temp.next
 
         #Add to the end if index not found
         self.tail.next = NewNode
+        temp = self.tail
         self.tail = self.tail.next
-        self.reset_position()
-
-    def AddStart(self, newdata):
-        NewNode = Node(newdata)
-        if self.head is None:
-            self.head = self.tail = NewNode
-            return
-        NewNode.next = self.head
-        self.head = NewNode
+        self.tail.prev = temp
     
-    def RemoveNode(self, removedata):
+    def RemoveNode(self, index):
         if self.head == None:
             raise Exception("List is empty")
 
-        if self.head.data == removedata:
-            self.head = self.head.next
-            self.reset_position()
+        count = 0
+        temp = self.head
+
+        if index == 0:
+            self.head = temp.next
             return
-        
-        if self.tail.data == removedata:
-            self.tail = self.tail.prev
-            self.reset_position()
-        
-        previous_node = self.head
-        for node in self:
-            if node.data == removedata:
-                previous_node.next = node.next
-                self.reset_position()
-                return
-            previous_node = node
+
+        #Find the correct index if playlist not empty
+        while temp is not None:
+            if temp == self.tail:
+                self.tail = prev
+                return temp
+
+            if count == index:  
+                prev.next = temp.next
+                return temp
+            count+=1
+            prev = temp
+            temp = temp.next
 
         raise Exception("Data not found in list")
 
@@ -107,7 +106,6 @@ class SLinkedList:
         while temp:
             if count == index:
                 self.head = temp
-                self.reset_position()
                 return  
             count+=1
             temp = temp.next
@@ -129,13 +127,4 @@ class SLinkedList:
             count+=1
             temp = temp.next
         return count
-
-    #Correct the positions of nodes
-    def reset_position(self):
-        position = 0
-        temp = self.head
-        while (temp):
-            temp.position = position
-            position+=1
-            temp = temp.next
 

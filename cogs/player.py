@@ -103,6 +103,12 @@ class Player(commands.Cog):
         index = int(index)
         self.playlist[ctx.message.guild.id].insert_between_playlist(index, song)
         await ctx.send(embed=EmbedMessage().print_add_song(song.title))
+    
+    @commands.command()
+    async def remove(self, ctx, index):
+        index = int(index)
+        song = self.playlist[ctx.message.guild.id].remove_from_playlist(index)
+        await ctx.send(embed=EmbedMessage().print_remove_song(song.title))
 
     @commands.command()
     async def jump(self, ctx, index):
@@ -159,7 +165,7 @@ class Player(commands.Cog):
         else:
             await ctx.send("Failed to run command")
             await ctx.send("Get more information on commands using !help")
-        print(type(error))
+        print(str(type(error))+" "+str(error))
         return
 
 def setup(client):
