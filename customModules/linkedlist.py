@@ -26,10 +26,19 @@ class SLinkedList:
         self.tail = self.head = None
     
     #Goes to next node without destroying the current one
-    #For non list loops
+    #For loops, I will rename this, and make a MoveNextNode have a different algorithm
     def MoveNextNode(self):
         if(self.head is not None):
+            #next and prev of tail
+            self.tail.next = self.head
+            self.tail.prev = self.tail
+            self.tail = self.tail.next
+
+            #moving head
             self.head = self.head.next
+            self.head.prev = self.tail
+            print(self.head.data.title)
+            print(self.tail.data.title)
             return
         #Set head and tail to none
         self.tail = self.head = None

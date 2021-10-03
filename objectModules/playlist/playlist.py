@@ -13,6 +13,10 @@ class Playlist:
         self.type = "MOVING"
         self.strategy = strategy(self)
 
+    #Method to control playlist behaviour
+    def set_strategy(self, strategy):
+        self.strategy = strategy(self)
+
     ###Functions to control playlist actions
 
     #get current song and goes to the next

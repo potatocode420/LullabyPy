@@ -126,6 +126,7 @@ class Player(commands.Cog):
         type = self.playlist[ctx.message.guild.id].type
         if type == "UNMOVING":
             type = self.playlist[ctx.message.guild.id].toggle_playlist_type()
+            self.playlist[ctx.message.guild.id].set_strategy(ConcretePlaylistStrategyMoving)
             await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
         else:
             await ctx.send(f"Playlist type is already {type}")
@@ -135,6 +136,7 @@ class Player(commands.Cog):
         type = self.playlist[ctx.message.guild.id].type
         if type == "MOVING":
             type = self.playlist[ctx.message.guild.id].toggle_playlist_type()
+            self.playlist[ctx.message.guild.id].set_strategy(ConcretePlaylistStrategyUnmoving)
             await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
         else:
             await ctx.send(f"Playlist type is already {type}")
@@ -157,9 +159,11 @@ class Player(commands.Cog):
                 await ctx.author.voice.channel.connect()
                 return
             else:
+                await ctx.send("You are not connected to a voice channel")
                 raise commands.CommandError("Author not connected to a voice channel.")
         
         if ctx.author.voice.channel is None:
+            await ctx.send("Author not same channel as voice client.")
             raise commands.CommandError("Author not same channel as voice client.")
 
     @commands.Cog.listener()
@@ -169,8 +173,6 @@ class Player(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             await ctx.send("No command found")
             await ctx.send("Get more information on commands using !help")
-        elif isinstance(error, commands.CommandError):
-            await ctx.send("You are not connected to a voice channel")
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Invalid arguments for command.")
             await ctx.send("Get more information on commands using !help")

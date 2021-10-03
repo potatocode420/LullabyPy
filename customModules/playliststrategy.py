@@ -38,7 +38,6 @@ class ConcretePlaylistStrategyUnmoving(PlaylistStrategy):
         if playlist.loopsong:
             print("loop")
             playlist.playlist.head.data = playlist.musicsource.from_url(playlist.current.data.url)
-            time.sleep(0.5)
             playlist.play_song(ctx)
             return
 
