@@ -1,8 +1,7 @@
-import time
 from abc import ABC, abstractmethod
 
 #STRATEGY INTERFACE
-class Strategy(ABC):
+class PlaylistStrategy(ABC):
     def __init__(self, playlist):
         self.playlist = playlist
     @abstractmethod
@@ -14,14 +13,13 @@ class Strategy(ABC):
         pass
 
 #CONCRETE STRATEGIES
-class ConcretePlaylistStrategyMoving(Strategy):
+class ConcretePlaylistStrategyMoving(PlaylistStrategy):
     #next song from playlist
     def next_from_playlist(self, ctx):
         playlist = self.playlist
         if playlist.loopsong:
             print("loop")
             playlist.playlist.head.data = playlist.musicsource.from_url(playlist.current.data.url)
-            time.sleep(0.5)
             playlist.play_song(ctx)
             return
 
@@ -33,9 +31,9 @@ class ConcretePlaylistStrategyMoving(Strategy):
     def previous_from_playlist(self, ctx):
         return
 
-class ConcretePlaylistStrategyUnmoving(Strategy):
+class ConcretePlaylistStrategyUnmoving(PlaylistStrategy):
     #next song from playlist
-    def next_from_playlist(self, ctx, loop):
+    def next_from_playlist(self, ctx):
         playlist = self.playlist
         if playlist.loopsong:
             print("loop")

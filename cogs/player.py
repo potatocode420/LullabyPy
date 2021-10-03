@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from customModules.embedmsg import EmbedMessage
 from objectModules.playlist.playlist import Playlist
+from customModules.playliststrategy import ConcretePlaylistStrategyMoving, ConcretePlaylistStrategyUnmoving
 
 class Server: 
     def __init__(self):
@@ -148,7 +149,7 @@ class Player(commands.Cog):
     @playlisttype.before_invoke
     async def ensure_voice(self, ctx):
         if self.playlist.get(ctx.message.guild.id) is None:
-            self.playlist[ctx.message.guild.id] = Playlist()
+            self.playlist[ctx.message.guild.id] = Playlist(ConcretePlaylistStrategyMoving)
         #this else statement will check for saved playlist, and then load the correct type accordingly
 
         if ctx.voice_client is None:

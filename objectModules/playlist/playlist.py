@@ -1,23 +1,17 @@
 import time
 from customModules.linkedlist import Node, SLinkedList
 from customModules.musicsource import MusicSource
-from customModules.playliststrategy import ConcretePlaylistStrategyMoving, ConcretePlaylistStrategyUnmoving, Strategy
+from customModules.playliststrategy import PlaylistStrategy
 from objectModules.song import Song
 
 class Playlist:
-    def __init__(self):
+    def __init__(self, strategy:PlaylistStrategy):
         self.playlist = SLinkedList()
         self.loopsong = False
         self.current = self.playlist.head
         self.musicsource = MusicSource()
         self.type = "MOVING"
-        self.strategy = ConcretePlaylistStrategyUnmoving(self)
-    
-    def set_strategy(self):
-        if self.type == "UNMOVING":
-            self.strategy = ConcretePlaylistStrategyUnmoving(self)
-        elif self.type == "MOVING":
-            self.strategy = ConcretePlaylistStrategyMoving(self)
+        self.strategy = strategy(self)
 
     ###Functions to control playlist actions
 
@@ -56,19 +50,8 @@ class Playlist:
 
     #next song from playlist
     def next_from_playlist(self, ctx):
-        self.set_strategy()
-        self.strategy.next_from_playlist(ctx, )
-        # if self.loopsong:
-        #     print("loop")
-        #     self.playlist.head.data = self.musicsource.from_url(self.current.data.url)
-        #     time.sleep(0.5)
-        #     self.play_song(ctx)
-        #     return
-
-        # if (self.current is not None):
-        #     print("next song")
-        #     self.playlist.NextNode() #goes to next node, deleting the current
-        #     self.play_song(ctx)
+        self.strategy.next_from_playlist(ctx)
+        time.sleep(0.5)
 
     #jump songs in playlist
     def jump_from_playlist(self, ctx, index):
@@ -106,6 +89,4 @@ class Playlist:
         else:
             self.type = "UNMOVING"
         return self.type
-
-    #save the playlist
     
