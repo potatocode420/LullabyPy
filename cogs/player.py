@@ -1,18 +1,7 @@
 import discord
-from discord import client
-from discord import player
 from discord.ext import commands
-from discord.ext.commands import errors
-from discord.ext.commands.core import before_invoke, command
-from customModules import playlist
-import os
-
-from customModules.musicsource import MusicSource
-from customModules.linkedlist import Node, SLinkedList
 from customModules.embedmsg import EmbedMessage
-from customModules.playlist import Playlist
-
-import asyncio
+from objectModules.playlist.playlist import Playlist
 
 class Server: 
     def __init__(self):
@@ -125,7 +114,29 @@ class Player(commands.Cog):
             await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id].current.data.title))
         else:
             await ctx.send(embed=EmbedMessage().print_current_song(None))
+    
+    @commands.group()
+    async def playlisttype(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
 
+    @playlisttype.group()
+    async def moving(self, ctx):
+        type = self.playlist[ctx.message.guild.id].type
+        if type == "UNMOVING":
+            type = self.playlist[ctx.message.guild.id].toggle_playlist_type()
+            await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
+        else:
+            await ctx.send(f"Playlist type is already {type}")
+    
+    @playlisttype.group()
+    async def unmoving(self, ctx):
+        type = self.playlist[ctx.message.guild.id].type
+        if type == "MOVING":
+            type = self.playlist[ctx.message.guild.id].toggle_playlist_type()
+            await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
+        else:
+            await ctx.send(f"Playlist type is already {type}")
 
     @play.before_invoke
     @pause.before_invoke
@@ -134,16 +145,17 @@ class Player(commands.Cog):
     @loop.before_invoke
     @insert.before_invoke
     @queue.before_invoke
+    @playlisttype.before_invoke
     async def ensure_voice(self, ctx):
         if self.playlist.get(ctx.message.guild.id) is None:
             self.playlist[ctx.message.guild.id] = Playlist()
+        #this else statement will check for saved playlist, and then load the correct type accordingly
 
         if ctx.voice_client is None:
             if ctx.author.voice:
                 await ctx.author.voice.channel.connect()
                 return
             else:
-                await ctx.send("You are not connected to a voice channel.")
                 raise commands.CommandError("Author not connected to a voice channel.")
         
         if ctx.author.voice.channel is None:
@@ -156,6 +168,8 @@ class Player(commands.Cog):
         elif isinstance(error, commands.CommandNotFound):
             await ctx.send("No command found")
             await ctx.send("Get more information on commands using !help")
+        elif isinstance(error, commands.CommandError):
+            await ctx.send("You are not connected to a voice channel")
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send("Invalid arguments for command.")
             await ctx.send("Get more information on commands using !help")

@@ -162,7 +162,13 @@ class TestLinkedList(unittest.TestCase):
         #Test for previous and next nodes
         self.assertEqual(newlist.head.next.data,"d")
         self.assertEqual(newlist.head.prev.data,"e")
+    
+    def test_copy_list(self):
+        oldlist = SLinkedList()
+        oldlist.AddEnd("a")
+        oldlist.AddEnd("b")
+        oldlist.AddEnd("c")
+        newlist = oldlist.CopyList()
+        self.assertEqual(newlist.PrintList(),"a b c")
         
-
-
 unittest.main()

@@ -50,3 +50,7 @@ class EmbedMessage:
             embedVar.add_field(name="** **", value=f"**{helpcommand['command']}** {helpcommand['description']}", inline=False)
             index+=1
         return embedVar
+
+    def print_playlist_type(self, type):
+        embedVar = discord.Embed(title="\u200b", description=f"Current playlist type is {type}", color=self.colour)
+        return embedVar
