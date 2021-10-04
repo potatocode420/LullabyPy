@@ -49,20 +49,29 @@ class Player(commands.Cog):
         if not ctx.voice_client.is_playing():
             self.playlist[ctx.message.guild.id].play_song(ctx)
 
-    @commands.command()
+    @commands.group()
     async def loop(self, ctx):
-        if self.playlist[ctx.message.guild.id].current is not None:
-            self.playlist[ctx.message.guild.id].loopsong = not self.playlist[ctx.message.guild.id].loopsong
-            if self.playlist[ctx.message.guild.id].loopsong:
-                await ctx.send("Now looping")
-            else:
-                await ctx.send("Loop disabled")
-            return
-        await ctx.send("No song to loop")
+        if ctx.invoked_subcommand is None:
+            await ctx.send(embed=EmbedMessage().print_loop_type(self.playlist[ctx.message.guild.id].loop))
+
+    @loop.group()
+    async def all(self, ctx):
+        self.playlist[ctx.message.guild.id].set_loop_type("ALL")
+        await ctx.send(f"Loop type is now {self.playlist[ctx.message.guild.id].loop}")
+
+    @loop.group()
+    async def one(self, ctx):
+        self.playlist[ctx.message.guild.id].set_loop_type("ONE")
+        await ctx.send(f"Loop type is now {self.playlist[ctx.message.guild.id].loop}")
+
+    @loop.group()
+    async def none(self, ctx):
+        self.playlist[ctx.message.guild.id].set_loop_type("NONE")
+        await ctx.send(f"Loop type is now {self.playlist[ctx.message.guild.id].loop}")
     
     @commands.command()
     async def skip(self, ctx):
-        if self.playlist[ctx.message.guild.id].count_in_playlist() > 1:    
+        if self.playlist[ctx.message.guild.id].count_in_playlist() > 1:
             self.playlist[ctx.message.guild.id].skip_song(ctx)
             await ctx.send(embed=EmbedMessage().print_current_song(self.playlist[ctx.message.guild.id].current.data.title))
             print("skip successful")
@@ -78,9 +87,9 @@ class Player(commands.Cog):
     async def queue(self, ctx):
         async with ctx.typing():
             if self.playlist[ctx.message.guild.id].current is not None:
-                message = EmbedMessage().print_queue(self.playlist[ctx.message.guild.id].current, self.playlist[ctx.message.guild.id].count_in_playlist())
+                message = self.playlist[ctx.message.guild.id].print_playlist()
             else:
-                message = EmbedMessage().print_queue(None, 0)
+                message = "No songs available in queue"
         await ctx.send(embed=message)
 
     @commands.command()
@@ -117,26 +126,28 @@ class Player(commands.Cog):
             await ctx.send(embed=EmbedMessage().print_current_song(None))
     
     @commands.group()
-    async def playlisttype(self, ctx):
+    async def playlist(self, ctx):
         if ctx.invoked_subcommand is None:
             await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
 
-    @playlisttype.group()
+    @playlist.group()
     async def moving(self, ctx):
         type = self.playlist[ctx.message.guild.id].type
         if type == "UNMOVING":
             type = self.playlist[ctx.message.guild.id].toggle_playlist_type()
             self.playlist[ctx.message.guild.id].set_strategy(ConcretePlaylistStrategyMoving)
+            self.playlist[ctx.message.guild.id].set_loop_type() #Reset the loop type
             await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
         else:
             await ctx.send(f"Playlist type is already {type}")
     
-    @playlisttype.group()
+    @playlist.group()
     async def unmoving(self, ctx):
         type = self.playlist[ctx.message.guild.id].type
         if type == "MOVING":
             type = self.playlist[ctx.message.guild.id].toggle_playlist_type()
             self.playlist[ctx.message.guild.id].set_strategy(ConcretePlaylistStrategyUnmoving)
+            self.playlist[ctx.message.guild.id].set_loop_type() #Reset the loop type
             await ctx.send(embed=EmbedMessage().print_playlist_type(self.playlist[ctx.message.guild.id].type))
         else:
             await ctx.send(f"Playlist type is already {type}")
@@ -148,7 +159,8 @@ class Player(commands.Cog):
     @loop.before_invoke
     @insert.before_invoke
     @queue.before_invoke
-    @playlisttype.before_invoke
+    @playlist.before_invoke
+    @loop.before_invoke
     async def ensure_voice(self, ctx):
         if self.playlist.get(ctx.message.guild.id) is None:
             self.playlist[ctx.message.guild.id] = Playlist(ConcretePlaylistStrategyMoving)

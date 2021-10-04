@@ -11,24 +11,26 @@ class SLinkedList:
       self.tail = None
 
     #Go to next node, destroys current one
-    #For list loops
-    def NextNode(self):
-        if(self.head is not None):
-            #delete remaining node
-            #this prevents playlist-wide looping
-            if self.head == self.head.next:
-                self.head = self.tail = None
-                return
-            self.head = self.tail.next = self.head.next
-            self.head.prev = self.tail
-            return
-        #Set head and tail to none
-        self.tail = self.head = None
+    #CURRENTLY UNUSED
+    # def NextNode(self):
+    #     if(self.head is not None):
+    #         #delete remaining node
+    #         #this prevents playlist-wide looping
+    #         if self.head == self.head.next:
+    #             self.head = self.tail = None
+    #             return
+    #         self.head = self.tail.next = self.head.next
+    #         self.head.prev = self.tail
+    #         return
+    #     #Set head and tail to none
+    #     self.tail = self.head = None
     
     #Goes to next node without destroying the current one
-    #For loops, I will rename this, and make a MoveNextNode have a different algorithm
-    def MoveNextNode(self):
+    def NextNode(self):
         if(self.head is not None):
+            if (self.head.next.next == self.head):
+                self.head = self.head.next
+                return
             #next and prev of tail
             self.tail.next = self.head
             self.tail.prev = self.tail
@@ -37,8 +39,6 @@ class SLinkedList:
             #moving head
             self.head = self.head.next
             self.head.prev = self.tail
-            print(self.head.data.title)
-            print(self.tail.data.title)
             return
         #Set head and tail to none
         self.tail = self.head = None
@@ -116,31 +116,29 @@ class SLinkedList:
         return  
     
     def RemoveFirst(self):
-        temp = self.head
-        prev = self.head.prev
         if self.head is None:
             raise Exception("List is empty")
         
-        if temp.next == temp:
+        if self.head.next == self.head:
             self.head = self.tail = None
             return
         
-        prev.next = temp.next
-        self.head = prev.next
+        if self.head is not None:
+            self.head = self.tail.next = self.head.next
+            self.head.prev = self.tail
 
     def RemoveLast(self):
-        temp = self.tail
-        prev = self.tail.prev
         if self.head is None:
             raise Exception("List is empty")
         
-        if temp.next == temp:
+        if self.tail.next == self.tail:
             self.head = self.tail = None
             return
         
-        prev.next = temp.next
-        self.tail = prev
-        self.head = prev.next
+        self.tail = self.head.prev = self.tail.prev
+        self.tail.next = self.head
+        # self.head = prev.next = temp.next
+        # self.tail = prev
     
     def RemoveNode(self, index):
         if self.head == None:
@@ -204,10 +202,13 @@ class SLinkedList:
     def PrintList(self):
         temp = self.head
         nodesinlist = ""
-        while (temp.next != self.head):
-            nodesinlist += temp.data + " "
-            temp = temp.next
-        nodesinlist += temp.data
+        if temp is not None:
+            while (temp.next != self.head):
+                nodesinlist += temp.data + " "
+                temp = temp.next
+            nodesinlist += temp.data
+        else:
+            return None
         return nodesinlist
     
     #Get count of linked list

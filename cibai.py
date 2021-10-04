@@ -56,40 +56,20 @@ class TestLinkedList(unittest.TestCase):
         self.assertEqual(newlist.GetNode(3).next.data,"a")
         #Test for new insertion value prev
         self.assertEqual(newlist.GetNode(3).prev.data,"c")
-    
-    def test_move_next_node(self):
-        newlist = SLinkedList()
-        newlist.AddEnd("a")
-        newlist.AddEnd("b")
-        newlist.AddEnd("c")
-        newlist.MoveNextNode()
-        newlist.MoveNextNode()
-        #test for current head
-        self.assertEqual(newlist.head.data, "c")
-        #test for next head
-        self.assertEqual(newlist.head.next.data, "a")
-        #test for prev
-        self.assertEqual(newlist.head.prev.data, "b")
 
     def test_next_node(self):
         newlist = SLinkedList()
         newlist.AddEnd("a")
         newlist.AddEnd("b")
         newlist.AddEnd("c")
-        newlist.AddEnd("d")
-        newlist.AddEnd("e")
         newlist.NextNode()
         newlist.NextNode()
         #test for current head
         self.assertEqual(newlist.head.data, "c")
-        #test for head next and prev
-        self.assertEqual(newlist.head.next.data, "d")
-        self.assertEqual(newlist.head.prev.data, "e")
-        #test for empty playlist after going through all next
-        newlist.NextNode()
-        newlist.NextNode()
-        newlist.NextNode()
-        self.assertEqual(newlist.head, None)
+        #test for next head
+        self.assertEqual(newlist.head.next.data, "a")
+        #test for prev
+        self.assertEqual(newlist.head.prev.data, "b")
 
     def test_remove_node(self):
         newlist = SLinkedList()
@@ -112,6 +92,31 @@ class TestLinkedList(unittest.TestCase):
         #test for none after removing all
         newlist.RemoveNode(1)
         self.assertEqual(newlist.head, None)
+
+    def test_remove_first_all(self):
+        newlist = SLinkedList()
+        newlist.AddEnd("a")
+        newlist.AddEnd("b")
+        newlist.AddEnd("c")
+        newlist.RemoveFirst()
+        self.assertEqual(newlist.PrintList(), "b c")
+        newlist.RemoveFirst()
+        self.assertEqual(newlist.PrintList(), "c")
+        newlist.RemoveFirst()
+        self.assertEqual(newlist.PrintList(), None)
+
+    def test_remove_last_all(self):
+        newlist = SLinkedList()
+        newlist.AddEnd("a")
+        newlist.AddEnd("b")
+        newlist.AddEnd("c")
+        newlist.RemoveLast()
+        self.assertEqual(newlist.PrintList(), "a b")
+        newlist.RemoveLast()
+        self.assertEqual(newlist.PrintList(), "a")
+        newlist.RemoveLast()
+        self.assertEqual(newlist.PrintList(), None)
+
 
     def test_remove_node_tail_head(self):
         newlist = SLinkedList()
@@ -162,13 +167,7 @@ class TestLinkedList(unittest.TestCase):
         #Test for previous and next nodes
         self.assertEqual(newlist.head.next.data,"d")
         self.assertEqual(newlist.head.prev.data,"e")
-    
-    def test_copy_list(self):
-        oldlist = SLinkedList()
-        oldlist.AddEnd("a")
-        oldlist.AddEnd("b")
-        oldlist.AddEnd("c")
-        newlist = oldlist.CopyList()
-        self.assertEqual(newlist.PrintList(),"a b c")
         
+
+
 unittest.main()

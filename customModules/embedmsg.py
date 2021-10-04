@@ -4,7 +4,7 @@ class EmbedMessage:
         self.message = "Bot created for non commercial purposes."
         self.colour = 0x00ff00
     
-    def print_queue(self, song, count):
+    def print_playlist_moving(self, song, count):
         index = 1
         songlist = ""
 
@@ -24,6 +24,26 @@ class EmbedMessage:
                 songlist += f"{index}. {song.data.title} duration: {song.data.duration}\n"
                 index +=1
             embedVar.add_field(name="Music Queue", value=songlist)
+        return embedVar
+
+    def print_playlist_unmoving(self, playlist):
+        index = 1
+        songlist = ""
+        song = playlist.playlist.GetNode(0)
+
+        #Section to show current
+        if song is not None:
+            while index <= playlist.count_in_playlist():
+                #highlights the current song
+                if (song == playlist.current):
+                    songlist += f"```fix\n{index}. {song.data.title} duration: {song.data.duration}```\n"
+                else:
+                    songlist += f"{index}. {song.data.title} duration: {song.data.duration}\n"
+                song = song.next
+                index +=1
+            embedVar = discord.Embed(title="Music Playlist", description=songlist, color=self.colour)
+        else:
+            embedVar = discord.Embed(title="Music playlist", description="No songs in playlist", color=self.colour)
         return embedVar
 
     def print_current_song(self, currentsong):
@@ -53,4 +73,8 @@ class EmbedMessage:
 
     def print_playlist_type(self, type):
         embedVar = discord.Embed(title="\u200b", description=f"Current playlist type is {type}", color=self.colour)
+        return embedVar
+
+    def print_loop_type(self, type):
+        embedVar = discord.Embed(title="\u200b", description=f"Current loop type is {type}", color=self.colour)
         return embedVar

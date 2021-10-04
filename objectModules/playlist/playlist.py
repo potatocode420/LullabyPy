@@ -1,4 +1,7 @@
 import time
+from discord.ext import commands
+
+from discord.ext.commands.errors import CommandError
 from customModules.linkedlist import Node, SLinkedList
 from customModules.musicsource import MusicSource
 from customModules.playliststrategy import PlaylistStrategy
@@ -7,7 +10,7 @@ from objectModules.song import Song
 class Playlist:
     def __init__(self, strategy:PlaylistStrategy):
         self.playlist = SLinkedList()
-        self.loopsong = False
+        self.loop = "NONE"
         self.current = self.playlist.head
         self.musicsource = MusicSource()
         self.type = "MOVING"
@@ -17,13 +20,22 @@ class Playlist:
     def set_strategy(self, strategy):
         self.strategy = strategy(self)
 
-    ###Functions to control playlist actions
+    #Methods for playlist utils
+    def print_playlist(self):
+        return self.strategy.print_playlist()
 
+    def set_loop_type(self, looptype="NONE"):
+        looptypes = ["NONE", "ONE", "ALL"]
+        if not looptype in looptypes:
+            raise commands.CommandError("Invalid loop type")
+        self.loop = looptype
+
+    #Functions to control playlist actions
     #get current song and goes to the next
-    def play_song(self, ctx):
+    def play_song(self, ctx, position=0):
         if self.playlist.head is not None:
             try:
-                self.current = self.playlist.head
+                self.current = self.playlist.GetNode(position)
                 ctx.voice_client.play(self.current.data.play, after=lambda e: self.next_from_playlist(ctx))
             except Exception as e:
                 print("Error in play_song: "+str(e))
@@ -32,7 +44,8 @@ class Playlist:
             self.current = None
 
     def skip_song(self, ctx):
-        self.loopsong = False
+        if self.loop == "ONE":
+            self.loop = "NONE"
         ctx.voice_client.pause()
         self.next_from_playlist(ctx)
 
@@ -63,7 +76,7 @@ class Playlist:
             raise Exception("Index must be more than 1") #cannot jump to current song
 
         index+=1 #current song is considered part of the index, so we increment 1 to skip over it
-        self.loopsong = False
+        self.loop = "NONE"
         self.playlist.JumpNode(index)
         ctx.voice_client.pause()
         self.play_song(ctx)

@@ -33,3 +33,8 @@ loop unmoving playlist
 save playlist
 
 change command playlisttype to playlist (aesthetics baby)
+
+NOTE: I should not have 2 ways to move next in the linked list. Bad structure.
+Rather, I should combine different LinkedList methods into the playlist to define
+the behaviour when calling next_from_playlist().
+Thus, the circular linked list can stay simple and true to its form.
