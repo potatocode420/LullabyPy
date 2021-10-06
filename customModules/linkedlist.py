@@ -216,7 +216,10 @@ class SLinkedList:
         temp = self.head
         #Count starts from one because increment for head is missing in loop
         count = 1
-        while (temp.next != self.head):
-            count+=1
-            temp = temp.next
+        if self.head is not None:
+            while (temp.next != self.head):
+                count+=1
+                temp = temp.next
+        else:
+            count = 0
         return count

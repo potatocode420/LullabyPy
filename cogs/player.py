@@ -3,6 +3,7 @@ from discord.ext import commands
 from customModules.embedmsg import EmbedMessage
 from objectModules.playlist.playlist import Playlist
 from customModules.playliststrategy import ConcretePlaylistStrategyMoving, ConcretePlaylistStrategyUnmoving
+import copy
 
 class Server: 
     def __init__(self):
@@ -20,6 +21,7 @@ class Player(commands.Cog):
     def __init__(self, bot : commands.Bot):
         self.bot = bot
         self.playlist = {}
+        self.saved_playlist = {}
 
     @commands.command()
     async def pause(self, ctx):
@@ -152,6 +154,30 @@ class Player(commands.Cog):
         else:
             await ctx.send(f"Playlist type is already {type}")
 
+    @commands.command()
+    async def save(self, ctx):
+        self.saved_playlist[ctx.message.guild.id] = copy.copy(self.playlist[ctx.message.guild.id])
+        await ctx.send("Current playlist saved!")
+
+    @commands.command()
+    async def loadsaved(self, ctx):
+        if self.saved_playlist[ctx.message.guild.id] is not None:
+            await ctx.send("Loading playlist...")
+            index = 0 
+            playlist = self.saved_playlist[ctx.message.guild.id]
+            temp = playlist.playlist.head
+            while index < playlist.count_in_playlist():
+                temp.data = playlist.musicsource.from_url(temp.data.url)
+                print(temp.data.title)
+                index+=1
+                temp = temp.next
+            self.playlist[ctx.message.guild.id] = copy.copy(playlist)
+            await ctx.send("Loaded")
+            ctx.voice_client.pause()
+            self.playlist[ctx.message.guild.id].play_song(ctx)
+            temp = self.playlist[ctx.message.guild.id].playlist.head
+            print(self.playlist[ctx.message.guild.id].strategy.playlist.count_in_playlist())
+
     @play.before_invoke
     @pause.before_invoke
     @stop.before_invoke
@@ -161,10 +187,11 @@ class Player(commands.Cog):
     @queue.before_invoke
     @playlist.before_invoke
     @loop.before_invoke
+    @loadsaved.before_invoke
+    @save.before_invoke
     async def ensure_voice(self, ctx):
         if self.playlist.get(ctx.message.guild.id) is None:
             self.playlist[ctx.message.guild.id] = Playlist(ConcretePlaylistStrategyMoving)
-        #this else statement will check for saved playlist, and then load the correct type accordingly
 
         if ctx.voice_client is None:
             if ctx.author.voice:
@@ -178,24 +205,24 @@ class Player(commands.Cog):
             await ctx.send("Author not same channel as voice client.")
             raise commands.CommandError("Author not same channel as voice client.")
 
-    @commands.Cog.listener()
-    async def on_command_error(self, ctx, error):
-        if isinstance(error, commands.MissingPermissions):
-            await ctx.send("No permissions to do that")
-        elif isinstance(error, commands.CommandNotFound):
-            await ctx.send("No command found")
-            await ctx.send("Get more information on commands using !help")
-        elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send("Invalid arguments for command.")
-            await ctx.send("Get more information on commands using !help")
-        elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send("Invalid arguments for command.")
-            await ctx.send("Get more information on commands using !help")
-        else:
-            await ctx.send("Failed to run command")
-            await ctx.send("Get more information on commands using !help")
-        print(str(type(error))+" "+str(error))
-        return
+    # @commands.Cog.listener()
+    # async def on_command_error(self, ctx, error):
+    #     if isinstance(error, commands.MissingPermissions):
+    #         await ctx.send("No permissions to do that")
+    #     elif isinstance(error, commands.CommandNotFound):
+    #         await ctx.send("No command found")
+    #         await ctx.send("Get more information on commands using !help")
+    #     elif isinstance(error, commands.MissingRequiredArgument):
+    #         await ctx.send("Invalid arguments for command.")
+    #         await ctx.send("Get more information on commands using !help")
+    #     elif isinstance(error, commands.CommandInvokeError):
+    #         await ctx.send("Invalid arguments for command.")
+    #         await ctx.send("Get more information on commands using !help")
+    #     else:
+    #         await ctx.send("Failed to run command")
+    #         await ctx.send("Get more information on commands using !help")
+    #     print(str(type(error))+" "+str(error))
+    #     return
 
 def setup(client):
     client.add_cog(Player(client))
