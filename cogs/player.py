@@ -162,21 +162,26 @@ class Player(commands.Cog):
     @commands.command()
     async def loadsaved(self, ctx):
         if self.saved_playlist[ctx.message.guild.id] is not None:
-            await ctx.send("Loading playlist...")
-            index = 0 
-            playlist = self.saved_playlist[ctx.message.guild.id]
-            temp = playlist.playlist.head
-            while index < playlist.count_in_playlist():
-                temp.data = playlist.musicsource.from_url(temp.data.url)
-                print(temp.data.title)
-                index+=1
-                temp = temp.next
-            self.playlist[ctx.message.guild.id] = copy.copy(playlist)
-            await ctx.send("Loaded")
+            async with ctx.typing():
+                await ctx.send("Loading playlist...")
+                index = 0 
+                playlist = copy.copy(self.saved_playlist[ctx.message.guild.id])
+                temp = playlist.playlist.head
+                while index < playlist.count_in_playlist():
+                    temp.data = playlist.musicsource.from_url(temp.data.url)
+                    print(temp.data.title)
+                    index+=1
+                    temp = temp.next
+                self.playlist[ctx.message.guild.id] = playlist
+                #Set the fucking strategy here
+                if self.playlist[ctx.message.guild.id].type == "MOVING":
+                    self.playlist[ctx.message.guild.id].set_strategy(ConcretePlaylistStrategyMoving) 
+                else:
+                     self.playlist[ctx.message.guild.id].set_strategy(ConcretePlaylistStrategyUnmoving)
+                await ctx.send("Loaded")
+                await self.queue(ctx)
             ctx.voice_client.pause()
             self.playlist[ctx.message.guild.id].play_song(ctx)
-            temp = self.playlist[ctx.message.guild.id].playlist.head
-            print(self.playlist[ctx.message.guild.id].strategy.playlist.count_in_playlist())
 
     @play.before_invoke
     @pause.before_invoke

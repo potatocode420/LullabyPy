@@ -83,7 +83,6 @@ class ConcretePlaylistStrategyUnmoving(PlaylistStrategy):
             if (self.index >= playlist.count_in_playlist()): #stops playing if reach the end
                 return
             playlist.play_song(ctx, self.index)
-            return
 
 
     def print_playlist(self):
