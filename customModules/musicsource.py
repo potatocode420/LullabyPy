@@ -4,7 +4,7 @@ import asyncio
 import youtube_dl
 import youtube_search
 import json
-from customModules.song import Song
+from objectModules.song import Song
 
 class MusicSource(discord.PCMVolumeTransformer):
     def __init__(self, volume=0.5):

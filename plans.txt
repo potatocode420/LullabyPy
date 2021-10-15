@@ -1,0 +1,40 @@
+2 playlist types
+
+PARENT: 
+PLAYLIST
+-play
+-
+
+
+CHILD:
+MOVING
+-skip (takes away current song)
+UNMOVING
+-skip (does not take away current song)
+
+CHANGING PLAYLISTS:
+1. declare playlist type
+2. change playlist type
+3. copy data over to the new playlist type
+4. profit
+
+Step 3 might not be optimal.
+Alternatives:
+1. populate both at once (ngl this is pretty bad)
+2. dont do inheritance (itll hurt scalability but we prob only need 2 of these shit)
+3. honestly 3 seems to be the best practice way to go
+
+UPDATE: I HAVE FOUND DE WAY (AKA USE THE SAME PLAYLIST AS IF ITS A SINGLETON)
+
+TODO:
+add position attribute to linkedlist (for unmoving playlist)
+
+loop unmoving playlist
+save playlist
+
+change command playlisttype to playlist (aesthetics baby)
+
+NOTE: I should not have 2 ways to move next in the linked list. Bad structure.
+Rather, I should combine different LinkedList methods into the playlist to define
+the behaviour when calling next_from_playlist().
+Thus, the circular linked list can stay simple and true to its form.
