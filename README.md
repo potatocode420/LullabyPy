@@ -2,10 +2,11 @@
 Discord music bot named Lullaby
 
 ## Future features
-1. -save Save playlist
-2. -playlist moving -playlist unmoving Different playlist types of moving and unmoving
+1. Allow individual saved playlists. Currently, there is only one saved playlist per server.
 
 ## Current problems
-1. Theoretically, playlist.py and player.py are supposed to work together. In hindsight, playlist.py is currently redundant. I will need to assign proper roles to these 2 files and refactor the code accordingly. (Most likely, player.py to deal with discord functions, and playlist.py for logic)
+1. If I have to make changes to the bot, everyone's saved playlists will disappear. To deal with this, there are 2 ways:
+    a. Declare the running and saved playlist outside of the actual cog (in the main player.py file maybe) so that when I make any adjustments to the cog, I can simply reload the cog without resetting the data.
+    b. Setup a database that stores all the user's playlists (NoSQL MongoDB).
 
-2. Currently, I am using youtube-dl to search songs online but it takes awhile for Lullaby to search up a song to stream. I am unsure of whether youtube-dl is the problem or the way I have coded it makes it slow.
+Since I absolutely cannot be arsed to make these changes at the moment I will not do it. If I do get complaints from my users (aka only my friends really) only then I will consider making these fixes. Until then, enjoy the bot as it is.

@@ -3,6 +3,10 @@ class EmbedMessage:
     def __init__(self):
         self.message = "Bot created for non commercial purposes."
         self.colour = 0x00ff00
+
+    def print_empty_playlist(self):
+        embedVar = discord.Embed(title="No songs available in queue", description="Add some songs using -play", color=self.colour)
+        return embedVar
     
     def print_playlist_moving(self, song, count):
         index = 1

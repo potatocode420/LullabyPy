@@ -10,6 +10,16 @@ class SLinkedList:
       self.head = None
       self.tail = None
 
+    def __iter__(self):
+        temp = self.head
+        if temp is not None:
+            while (temp.next != self.head):
+                yield temp
+                temp = temp.next
+            yield temp
+        else:
+            return None
+
     #Go to next node, destroys current one
     #CURRENTLY UNUSED
     # def NextNode(self):
