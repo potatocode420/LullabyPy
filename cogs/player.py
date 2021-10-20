@@ -52,6 +52,7 @@ class Player(commands.Cog):
 
     @commands.command()
     async def play(self, ctx, *, url):
+        print(ctx.message.author.name)
         async with ctx.typing():
             song = self.playlist[ctx.message.guild.id].musicsource.from_url(url)
         if song is None:
