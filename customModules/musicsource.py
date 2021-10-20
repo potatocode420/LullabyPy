@@ -45,7 +45,7 @@ class MusicSource(discord.PCMVolumeTransformer):
 
         play = discord.FFmpegPCMAudio(filename, **{
             'options': "-vn",
-            "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5 ",
+            "before_options": "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5",
         })
         song = Song(play, data["title"], data["duration"], url)
 

@@ -182,7 +182,7 @@ class Player(commands.Cog):
 
     @commands.command()
     async def loadsaved(self, ctx):
-        if self.saved_playlist[ctx.message.guild.id] is not None:
+        if self.saved_playlist.get(ctx.message.guild.id) is not None:
             async with ctx.typing():
                 await ctx.send("Loading playlist...")
                 #load playlist here
@@ -197,6 +197,8 @@ class Player(commands.Cog):
             ctx.voice_client.pause()
             self.playlist[ctx.message.guild.id].play_song(ctx)
             await self.queue(ctx)
+        else:
+            await ctx.send("No saved playlist")
 
     @play.before_invoke
     @pause.before_invoke
