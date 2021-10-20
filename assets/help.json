@@ -1,44 +1,64 @@
 {
     "help": [
         {
-            "command": "-play <song>",
+            "command": "!play <song>",
             "description": "Plays a song. Adds to queue if there is a song playing."
         },
         {
-            "command": "-pause",
+            "command": "!pause",
             "description": "Pauses current song"
         },
         {
-            "command": "-resume",
+            "command": "!resume",
             "description": "Resumes current song"
         },
         {
-            "command": "-np",
+            "command": "!np",
             "description": "Returns the song that is currently playing"
         },
         {
-            "command": "-loop",
-            "description": "Loops current song. Use again to disable"
+            "command": "!loop",
+            "description": "Show current loop status"
         },
         {
-            "command": "-skip",
+            "command": "!loop one",
+            "description": "Loops current song"
+        },
+        {
+            "command": "!loop all",
+            "description": "Loops entire playlist"
+        },
+        {
+            "command": "!loop none",
+            "description": "Disable loop"
+        },
+        {
+            "command": "!skip",
             "description": "Skips current song if it is not the last song"
         },
         {
-            "command": "-stop",
+            "command": "!stop",
             "description": "Remove Lullaby from voice channel"
         },
         {
-            "command": "-queue",
+            "command": "!queue",
             "description": "Returns the current song list"
         },
         {
-            "command": "-insert <index> <song>",
+            "command": "!insert <index> <song>",
             "description": "Inserts song at the chosen index"
         },
         {
-            "command": "-jump <index>",
+            "command": "!jump <index>",
             "description": "Jumps to the chosen index"
+        },
+        {
+            "command": "!save",
+            "description": "Saves current playlist queue and type"
+        },
+        {
+            "command": "!loadsaved",
+            "description": "Loads saved playlist if any"
         }
     ]
 }
