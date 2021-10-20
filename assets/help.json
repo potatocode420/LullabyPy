@@ -59,6 +59,10 @@
         {
             "command": "!loadsaved",
             "description": "Loads saved playlist if any"
+        },
+        {
+            "command": "-tesst heroku",
+            "description": "Loops current song. Use again to disable"
         }
     ]
 }
