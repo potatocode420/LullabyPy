@@ -238,7 +238,7 @@ class Player(commands.Cog):
             await ctx.send("Invalid arguments for command.")
             await ctx.send("Get more information on commands using !help")
         elif isinstance(error, commands.CommandInvokeError):
-            await ctx.send("Invalid arguments for command.")
+            await ctx.send("Invalid use of command.")
             await ctx.send("Get more information on commands using !help")
         else:
             await ctx.send("Failed to run command")
