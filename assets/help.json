@@ -59,6 +59,10 @@
         {
             "command": "!loadsaved",
             "description": "Loads saved playlist if any"
+        },
+        {
+            "command": "!playlist",
+            "description": "Returns current playlist type"
         }
     ]
 }
