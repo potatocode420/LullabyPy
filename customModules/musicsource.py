@@ -35,6 +35,7 @@ class MusicSource(discord.PCMVolumeTransformer):
         return yt_url
 
     def from_url(self, url, stream=True, loop=False):
+        url = self.search(url)
         data = self.ytdl.extract_info(url, download=False)
         if data["entries"]:
             data = data['entries'][0]
