@@ -67,6 +67,10 @@
         {
             "command": "!playlist MOVING",
             "description": "Changes playlist type to MOVING"
+        },
+        {
+            "command": "!playlist UNMOVING",
+            "description": "Changes playlist type to UNMOVING"
         }
     ]
 }
