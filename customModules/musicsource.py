@@ -37,8 +37,11 @@ class MusicSource(discord.PCMVolumeTransformer):
     def from_url(self, url, stream=True, loop=False):
         data = self.ytdl.extract_info(url, download=False)
         if data:
-            data = data['entries'][0]
-            filename = data['formats'][0]['url'] if stream else self.ytdl.prepare_filename(data)
+            if 'entries' in data:
+                data = data['entries'][0]
+                filename = data['formats'][0]['url'] if stream else self.ytdl.prepare_filename(data)
+            else:
+                filename = data['url']
         else:
             print("No entries found")
             return None
