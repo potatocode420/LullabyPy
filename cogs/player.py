@@ -7,6 +7,7 @@ from customModules.playliststrategy import ConcretePlaylistStrategyMoving, Concr
 
 import json
 import os
+import aiohttp
 
 class Server: 
     def __init__(self):
@@ -200,6 +201,24 @@ class Player(commands.Cog):
             await self.queue(ctx)
         else:
             await ctx.send("No saved playlist")
+    
+    @commands.command()
+    async def lyrics(self, ctx):
+        if (self.playlist[ctx.message.guild.id].current is not None):
+            url = "https://some-random-api.ml/lyrics?title="
+            title = self.playlist[ctx.message.guild.id].current.data.title
+        else:
+            await ctx.send("No song playing")
+            return
+
+        async with ctx.typing():
+            async with aiohttp.request("GET", url + title, headers={}) as r:
+                if not 200 <= r.status <= 299:
+                    await ctx.send("No lyrics found")
+                    return
+
+                data = await r.json()
+                await ctx.send(embed=EmbedMessage().print_lyrics(data["title"],data["author"],data["lyrics"],data["thumbnail"]["genius"]))
 
     @play.before_invoke
     @pause.before_invoke

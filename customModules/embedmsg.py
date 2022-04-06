@@ -82,3 +82,10 @@ class EmbedMessage:
     def print_loop_type(self, type):
         embedVar = discord.Embed(title="\u200b", description=f"Current loop type is {type}", color=self.colour)
         return embedVar
+
+    def print_lyrics(self, title, author, lyrics, thumbnail):
+        print(thumbnail)
+        embedVar = discord.Embed(title=title, description=lyrics, color=self.colour)
+        embedVar.set_thumbnail(url=thumbnail)
+        embedVar.set_author(name=author)
+        return embedVar

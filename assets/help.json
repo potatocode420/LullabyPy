@@ -71,6 +71,10 @@
         {
             "command": "!playlist UNMOVING",
             "description": "Changes playlist type to UNMOVING"
+        },
+        {
+            "command": "!lyrics",
+            "description": "Get lyrics of the current song"
         }
     ]
 }
